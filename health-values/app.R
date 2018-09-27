@@ -1,36 +1,54 @@
 library(shiny)
 library(tidyverse)
+library(RColorBrewer)
+library(shinydashboard)
+
+
 health <- read_csv("../data/ghdx.csv")
 values <- read_csv("../data/wvsData.csv")
 
 valueCountries <- sort(unique(values$Country))
+latlonDF <-read.csv("latlong")
+values = merge(values, latlonDF, by.x = "Country", by.y = "V4", all = FALSE)
+cols = brewer.pal(9, "YlOrRd")[c(1, 2, 4, 6, 7)]
+newInfMort = cut(allCtryData$infMort, breaks = 5)
 
-ui <- fluidPage(
+ui <- dashboardPage(
   
-  titlePanel("Global Women's Health and World Values"),
+  dashboardHeader(title = "Global Women's Health and World Values"),
   
-  sidebarLayout(
-    sidebarPanel(
-      
-      selectInput("countries_vTab", 
-                  "Countries", 
-                  choices = c("All", valueCountries),
-                  selected = "All",
-                  multiple = TRUE),
-      
-      checkboxGroupInput("value1_vTab",
-                         "Justifiable?",
-                         choices = names(values)[c(-1, -5)],
-                         selected = names(values[2]))
-    ),
-    
-    mainPanel(
-      
-      plotOutput("valuesPlot",
-                 height = "800px")
-      
+  dashboardSidebar(
+    sidebarMenu(
+      menuItem("World Maps", tabName = "wmaps", icon = icon("globe")),
+      menuItem("Visualizations", tabName = "visuals", icon = icon("chart bar"))
     )
-  )
+  ),
+    
+    dashboardBody(
+      tabItems(
+        tabItem(tabName = "visuals",
+                fluidPage(selectInput("countries_vTab", 
+                                      "Countries", 
+                                      choices = c("All", valueCountries),
+                                      selected = "All",
+                                      multiple = TRUE),
+                          
+                          checkboxGroupInput("value1_vTab",
+                                             "Justifiable?",
+                                             choices = names(values)[c(-1, -5)],
+                                             selected = names(values[2]))),
+                plotOutput("valuesPlot",
+                           height = "800px")
+                
+          
+        ),
+        tabItem(tabName = "wmaps", fluidPage(
+          h2(strong("WORK COMING SOON"))
+        ))
+        
+      )
+    )
+
 )
 
 server <- function(input, output) {
