@@ -21,7 +21,7 @@ ui <- fluidPage(
         checkboxGroupInput("value1_vTab",
                     "Justifiable?",
                     choices = names(values)[c(-1, -5)],
-                    selected = NULL)
+                    selected = names(values[2]))
       ),
       
       mainPanel(
@@ -35,9 +35,30 @@ ui <- fluidPage(
 server <- function(input, output) {
    
   output$valuesPlot <- renderPlot({
-    ggplot()
+    
+    if(input$countries_vTab == "All"){
+      
+      ggplot(data = values,
+             aes(x = input$value1_vTab,
+                 y = Country)) + 
+        geom_boxplot()
+      
+    } else {
+      
+      ggplot(data = values %>%
+               filter(Country %in% input$countries_vTab),
+             aes(x = input$value1_vTab,
+                 y = Country))
+      
+    }
   })
   
 }
 
 shinyApp(ui = ui, server = server)
+
+
+
+
+
+
