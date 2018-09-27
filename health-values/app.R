@@ -95,7 +95,8 @@ server <- function(input, output) {
           
           ggplot(data = val_filt,
                  aes(x = value1,
-                     y = value2)) +
+                     y = value2,
+                     color = Country)) +
             geom_jitter(alpha = 0.05) +
             labs(x = input$value1_vTab[1],
                  y = input$value1_vTab[2])
